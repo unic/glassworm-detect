@@ -1,0 +1,8 @@
+.DS_Store
+*.swp
+target
+.claude
+scratch
+*.plan
+.history
+glassworm-scan-*.log
