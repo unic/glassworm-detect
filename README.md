@@ -1,6 +1,11 @@
 # Glassworm Extension Detection Tool
 
-A bash script to detect and remove malicious VSCode extensions affected by the **Glassworm** supply chain attack (October 2025).
+Cross-platform detection and removal tool for malicious VSCode extensions affected by the **Glassworm** supply chain attack (October 2025).
+
+Available for:
+
+- 🐧 **Linux/macOS**: Bash script (`glassworm-detect.sh`)
+- 🪟 **Windows**: PowerShell script (`glassworm-detect.ps1`)
 
 ## What is Glassworm?
 
@@ -37,11 +42,13 @@ This tool checks for the following malicious extensions and their compromised ve
 
 ## Requirements
 
+### For Linux/macOS (Bash Script)
+
 - **Bash 4.0+** (the script uses associative arrays)
 - **macOS/Linux** operating system
 - VSCode, VSCode Insiders, or VSCodium installed (optional - script will check all)
 
-### Checking Your Bash Version
+#### Checking Your Bash Version
 
 ```bash
 bash --version
@@ -59,14 +66,50 @@ brew install bash
 
 The script uses `#!/usr/bin/env bash` to automatically use the newer version if available.
 
+### For Windows (PowerShell Script)
+
+- **PowerShell Core 7.0+** (recommended) or **Windows PowerShell 5.1+**
+- **Windows** operating system
+- VSCode, VSCode Insiders, or VSCodium installed (optional - script will check all)
+
+#### Checking Your PowerShell Version
+
+```powershell
+$PSVersionTable.PSVersion
+```
+
+#### Installing PowerShell Core (Recommended)
+
+If you need to install or upgrade to PowerShell Core:
+
+```powershell
+# Using winget (Windows 10/11)
+winget install --id Microsoft.PowerShell --source winget
+
+# Or download from: https://github.com/PowerShell/PowerShell/releases
+```
+
+#### Setting Execution Policy
+
+If you encounter execution policy errors when running the script:
+
+```powershell
+# Allow scripts from remote sources (recommended)
+Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope CurrentUser
+
+# Or allow all scripts (less secure)
+Set-ExecutionPolicy -ExecutionPolicy Unrestricted -Scope CurrentUser
+```
+
 ## Usage
 
-### Basic Usage
+### Linux/macOS (Bash)
 
 1. **Clone the repository**:
 
    ```bash
    git clone https://github.com/unic/glassworm-detect
+   cd glassworm-detect
    ```
 
 2. **Make the script executable** (if not already):
@@ -82,6 +125,31 @@ The script uses `#!/usr/bin/env bash` to automatically use the newer version if 
    ```
 
 4. **Follow the prompts** - if infected extensions are found, you'll be asked whether to uninstall them.
+
+### Windows (PowerShell)
+
+1. **Clone the repository**:
+
+   ```powershell
+   git clone https://github.com/unic/glassworm-detect
+   cd glassworm-detect
+   ```
+
+2. **Run the script**:
+
+   ```powershell
+   .\glassworm-detect.ps1
+   ```
+
+   Or with PowerShell Core explicitly:
+
+   ```powershell
+   pwsh .\glassworm-detect.ps1
+   ```
+
+3. **Follow the prompts** - if infected extensions are found, you'll be asked whether to uninstall them.
+
+> **Note**: If you get an execution policy error, see the [Setting Execution Policy](#setting-execution-policy) section above.
 
 ### What the Script Does
 
@@ -107,19 +175,32 @@ The script will:
 
 ### Exit Codes
 
-The script returns meaningful exit codes for automation:
+Both scripts return meaningful exit codes for automation:
 
 - `0` - Clean system, no infections found
 - `1` - Infected extensions detected
 
-This allows you to use it in scripts:
+This allows you to use them in scripts:
+
+**Bash:**
 
 ```bash
 if ./glassworm-detect.sh; then
-    echo "System is clean"
+  echo "System is clean"
 else
-    echo "Infections found - please review"
+  echo "Infections found - please review"
 fi
+```
+
+**PowerShell:**
+
+```powershell
+.\glassworm-detect.ps1
+if ($LASTEXITCODE -eq 0) {
+  Write-Host "System is clean"
+} else {
+  Write-Host "Infections found - please review"
+}
 ```
 
 ## How It Works
@@ -162,6 +243,7 @@ The log contains:
 
 - Scan timestamp
 - User who ran the scan
+- Computer name (PowerShell only)
 - VSCode installations found
 - List of infected extensions (if any)
 
@@ -275,10 +357,20 @@ If the script detects infected extensions, you should:
 
 ## Contributing
 
-If you discover additional compromised extensions or versions, please update the `MALICIOUS_EXTENSIONS` associative array in the script:
+If you discover additional compromised extensions or versions, please update the malicious extensions list:
+
+**In Bash script** (`glassworm-detect.sh`):
 
 ```bash
 MALICIOUS_EXTENSIONS["publisher.extension-name"]="version1 version2"
+```
+
+**In PowerShell script** (`glassworm-detect.ps1`):
+
+```powershell
+$MaliciousExtensions = @{
+  "publisher.extension-name" = @("version1", "version2")
+}
 ```
 
 ## License
