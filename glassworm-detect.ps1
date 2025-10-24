@@ -88,7 +88,10 @@ function Test-VSCodeInstallation {
 
 	# Get installed extensions with versions
 	try {
-		$installedExtensions = & $actualCommand --list-extensions --show-versions 2>$null
+		$installedExtensions = & $actualCommand --list-extensions --show-versions 2>&1
+		if ($LASTEXITCODE -ne 0) {
+			throw "Failed to retrieve extensions"
+		}
 	}
 	catch {
 		Write-Host "  ⚠ Error retrieving extensions" -ForegroundColor Yellow
