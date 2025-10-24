@@ -44,7 +44,7 @@ This tool checks for the following malicious extensions and their compromised ve
 
 ### For Linux/macOS (Bash Script)
 
-- **Bash 4.0+** (the script uses associative arrays)
+- **Bash 3.2+** (compatible with both Bash 3 and 4+)
 - **macOS/Linux** operating system
 - VSCode, VSCode Insiders, or VSCodium installed (optional - script will check all)
 
@@ -54,17 +54,7 @@ This tool checks for the following malicious extensions and their compromised ve
 bash --version
 ```
 
-On macOS, the default `/bin/bash` is version 3.2. If you need to upgrade:
-
-```bash
-# Install via Homebrew
-brew install bash
-
-# Verify installation
-/usr/local/bin/bash --version
-```
-
-The script uses `#!/usr/bin/env bash` to automatically use the newer version if available.
+The script is fully compatible with macOS's default Bash 3.2 and newer versions. No upgrade needed!
 
 ### For Windows (PowerShell Script)
 

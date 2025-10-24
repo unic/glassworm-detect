@@ -12,25 +12,41 @@ BLUE='\033[0;34m'
 NC='\033[0m' # No Color
 
 # Known malicious extensions with affected versions
-declare -A MALICIOUS_EXTENSIONS
-MALICIOUS_EXTENSIONS["codejoy.codejoy-vscode-extension"]="1.8.3 1.8.4"
-MALICIOUS_EXTENSIONS["l-igh-t.vscode-theme-seti-folder"]="1.2.3"
-MALICIOUS_EXTENSIONS["kleinesfilmroellchen.serenity-dsl-syntaxhighlight"]="0.3.2"
-MALICIOUS_EXTENSIONS["JScearcy.rust-doc-viewer"]="4.2.1"
-MALICIOUS_EXTENSIONS["SIRILMP.dark-theme-sm"]="3.11.4"
-MALICIOUS_EXTENSIONS["CodeInKlingon.git-worktree-menu"]="1.0.9 1.0.91"
-MALICIOUS_EXTENSIONS["ginfuru.better-nunjucks"]="0.3.2"
-MALICIOUS_EXTENSIONS["ellacrity.recoil"]="0.7.4"
-MALICIOUS_EXTENSIONS["grrrck.positron-plus-1-e"]="0.0.71"
-MALICIOUS_EXTENSIONS["jeronimoekerdt.color-picker-universal"]="2.8.91"
-MALICIOUS_EXTENSIONS["srcery-colors.srcery-colors"]="0.3.9"
-MALICIOUS_EXTENSIONS["sissel.shopify-liquid"]="4.0.1"
-MALICIOUS_EXTENSIONS["TretinV3.forts-api-extention"]="0.3.1"
-MALICIOUS_EXTENSIONS["cline-ai-main.cline-ai-agent"]="3.1.3"
+# Format: "extension_id|version1 version2 ..."
+MALICIOUS_EXTENSIONS=(
+	"codejoy.codejoy-vscode-extension|1.8.3 1.8.4"
+	"l-igh-t.vscode-theme-seti-folder|1.2.3"
+	"kleinesfilmroellchen.serenity-dsl-syntaxhighlight|0.3.2"
+	"JScearcy.rust-doc-viewer|4.2.1"
+	"SIRILMP.dark-theme-sm|3.11.4"
+	"CodeInKlingon.git-worktree-menu|1.0.9 1.0.91"
+	"ginfuru.better-nunjucks|0.3.2"
+	"ellacrity.recoil|0.7.4"
+	"grrrck.positron-plus-1-e|0.0.71"
+	"jeronimoekerdt.color-picker-universal|2.8.91"
+	"srcery-colors.srcery-colors|0.3.9"
+	"sissel.shopify-liquid|4.0.1"
+	"TretinV3.forts-api-extention|0.3.1"
+	"cline-ai-main.cline-ai-agent|3.1.3"
+)
 
 # Array to store found infected extensions
-declare -a INFECTED_EXTENSIONS=()
-declare -a VSCODE_COMMANDS=()
+INFECTED_EXTENSIONS=()
+VSCODE_COMMANDS=()
+
+# Function to get malicious versions for an extension ID
+get_malicious_versions() {
+	local ext_id="$1"
+	for entry in "${MALICIOUS_EXTENSIONS[@]}"; do
+		local entry_id="${entry%%|*}"
+		local entry_versions="${entry#*|}"
+		if [[ "$entry_id" == "$ext_id" ]]; then
+			echo "$entry_versions"
+			return 0
+		fi
+	done
+	return 1
+}
 
 # Function to print header
 print_header() {
@@ -77,9 +93,10 @@ check_vscode_installation() {
 		local ext_version="${ext_line##*@}"
 
 		# Check if this extension is in the malicious list
-		if [[ -n "${MALICIOUS_EXTENSIONS["$ext_id"]}" ]]; then
+		local malicious_versions
+		malicious_versions=$(get_malicious_versions "$ext_id")
+		if [ -n "$malicious_versions" ]; then
 			# Check if the installed version matches a malicious version
-			local malicious_versions="${MALICIOUS_EXTENSIONS["$ext_id"]}"
 			for bad_version in $malicious_versions; do
 				if [[ "$ext_version" == "$bad_version" ]]; then
 					INFECTED_EXTENSIONS+=("$name:$ext_id@$ext_version")
